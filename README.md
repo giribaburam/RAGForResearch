@@ -102,3 +102,14 @@ Initialize Git Repository
 Run:
 
 git init
+
+git remote add origin https://github.com/giribaburam/RAGForResearch.git
+
+git pull origin main
+
+How to add change back to github
+
+git add .
+git commit -m "any notes"
+git push origin main
+
