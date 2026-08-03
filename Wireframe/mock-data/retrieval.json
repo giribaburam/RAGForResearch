@@ -1,0 +1,88 @@
+{
+  "query": "How does the proposed architecture compare to the Transformer baseline shown in Figure 4?",
+  "timestamp": "2026-08-02T20:15:00Z",
+  "retrieval": {
+    "intent": "Mixed",
+    "denseSearch": true,
+    "sparseSearch": true,
+    "hybridScore": 0.96,
+    "latencyMs": 1087,
+    "promptTokens": 11422,
+    "completionTokens": 624,
+    "model": "GPT-4o",
+    "embeddingModel": "BGE-M3",
+    "vectorDatabase": "Qdrant"
+  },
+  "retrievedChunks": [
+    {
+      "id": "chunk-018",
+      "documentId": "doc-001",
+      "page": 18,
+      "section": "4.2 Experimental Results",
+      "score": 0.97,
+      "type": "text",
+      "content": "The proposed architecture converges faster than the Transformer baseline after epoch 12."
+    },
+    {
+      "id": "chunk-019",
+      "documentId": "doc-001",
+      "page": 18,
+      "section": "Figure Discussion",
+      "score": 0.95,
+      "type": "figure",
+      "figureId": "fig-004",
+      "summary": "Training loss convergence over 50 epochs."
+    },
+    {
+      "id": "chunk-020",
+      "documentId": "doc-001",
+      "page": 19,
+      "section": "Latency Results",
+      "score": 0.93,
+      "type": "table",
+      "tableId": "tbl-003",
+      "rows": [
+        {
+          "model": "Transformer",
+          "latency": "42 ms",
+          "accuracy": "91.8%"
+        },
+        {
+          "model": "Proposed",
+          "latency": "34 ms",
+          "accuracy": "93.6%"
+        }
+      ]
+    },
+    {
+      "id": "chunk-021",
+      "documentId": "doc-001",
+      "page": 15,
+      "section": "Model Equation",
+      "score": 0.91,
+      "type": "equation",
+      "equationId": "eq-012",
+      "latex": "\\mathbf{A}x=b"
+    }
+  ],
+  "diagnostics": {
+    "retrievedChunks": 12,
+    "usedChunks": 5,
+    "discardedChunks": 7,
+    "retrievedFigures": 2,
+    "retrievedTables": 1,
+    "retrievedEquations": 1,
+    "reranked": true,
+    "crossVerification": {
+      "figureTableConsistency": true,
+      "numericalAgreement": 0.99
+    }
+  },
+  "generatedAnswer": {
+    "text": "The proposed architecture demonstrates faster convergence than the Transformer baseline while reducing inference latency by approximately 18%. Figure 4 illustrates smoother optimization after epoch 12, and Table 3 confirms improved latency and accuracy.",
+    "citations": [
+      "cite-001",
+      "cite-002"
+    ]
+  }
+}

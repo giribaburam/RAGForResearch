@@ -1,0 +1,83 @@
+{
+  "collections": [
+    {
+      "id": "col-ai",
+      "name": "AI Research",
+      "color": "#2563eb"
+    },
+    {
+      "id": "col-vision",
+      "name": "Vision Models",
+      "color": "#7c3aed"
+    },
+    {
+      "id": "col-rag",
+      "name": "RAG Papers",
+      "color": "#059669"
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc-001",
+      "title": "Transformer Optimization for Efficient Language Models",
+      "authors": [
+        "Jane Doe",
+        "John Smith"
+      ],
+      "year": 2025,
+      "pages": 52,
+      "collection": "col-ai",
+      "tags": [
+        "Transformer",
+        "Optimization",
+        "Attention"
+      ],
+      "status": "Indexed",
+      "thumbnail": "/assets/sample-pdf.png",
+      "file": "/pdfs/transformer-optimization.pdf",
+      "summary": "Explores optimization strategies for transformer architectures with latency improvements.",
+      "uploadedAt": "2026-07-30T12:15:00Z",
+      "indexedAt": "2026-07-30T12:28:45Z"
+    },
+    {
+      "id": "doc-002",
+      "title": "Vision-Language Models Survey",
+      "authors": [
+        "Alice Chen",
+        "Mark Johnson"
+      ],
+      "year": 2025,
+      "pages": 88,
+      "collection": "col-vision",
+      "tags": [
+        "VLM",
+        "Multimodal",
+        "Vision"
+      ],
+      "status": "Processing",
+      "thumbnail": "/assets/sample-pdf.png",
+      "file": "/pdfs/vlm-survey.pdf",
+      "summary": "Comprehensive survey of modern multimodal vision-language architectures.",
+      "uploadedAt": "2026-08-01T09:00:00Z"
+    },
+    {
+      "id": "doc-003",
+      "title": "Multimodal RAG Benchmark",
+      "authors": [
+        "Open Research Group"
+      ],
+      "year": 2026,
+      "pages": 64,
+      "collection": "col-rag",
+      "tags": [
+        "RAG",
+        "Evaluation",
+        "Benchmark"
+      ],
+      "status": "Queued",
+      "thumbnail": "/assets/sample-pdf.png",
+      "file": "/pdfs/rag-benchmark.pdf",
+      "summary": "Benchmark comparing multimodal retrieval pipelines across public datasets."
+    }
+  ]
+}

@@ -1,0 +1,4884 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ResearchRAG - Multimodal Research Assistant</title>
+
+<style>
+
+:root {
+
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+
+    --bg:#f8fafc;
+    --surface:#ffffff;
+    --border:#e5e7eb;
+
+    --text:#111827;
+    --muted:#6b7280;
+
+    --success:#10b981;
+    --warning:#f59e0b;
+    --danger:#ef4444;
+
+}
+
+
+* {
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+
+body {
+
+    font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+    background:var(--bg);
+    color:var(--text);
+
+    height:100vh;
+    overflow:hidden;
+
+}
+
+
+.app {
+
+    display:grid;
+
+    grid-template-columns:
+        280px
+        minmax(500px,1fr)
+        390px;
+
+    height:100vh;
+
+}
+
+
+/* =====================
+   SIDEBAR
+===================== */
+
+
+.sidebar {
+
+    background:white;
+
+    border-right:1px solid var(--border);
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+.brand {
+
+    height:70px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:0 22px;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+
+.logo {
+
+    width:38px;
+
+    height:38px;
+
+    border-radius:10px;
+
+    background:
+    linear-gradient(
+        135deg,
+        #2563eb,
+        #7c3aed
+    );
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:white;
+
+    font-weight:700;
+
+}
+
+
+.brand h1 {
+
+    font-size:20px;
+
+}
+
+
+.library {
+
+    padding:20px;
+
+    overflow:auto;
+
+}
+
+
+.section-title {
+
+    font-size:12px;
+
+    font-weight:700;
+
+    color:var(--muted);
+
+    text-transform:uppercase;
+
+    margin-bottom:12px;
+
+}
+
+
+.collection {
+
+    margin-bottom:18px;
+
+}
+
+
+.collection-title {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:8px;
+
+    cursor:pointer;
+
+    border-radius:8px;
+
+}
+
+
+.collection-title:hover {
+
+    background:#f1f5f9;
+
+}
+
+
+.document {
+
+    padding:12px;
+
+    margin-top:6px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    border:1px solid transparent;
+
+}
+
+
+.document:hover {
+
+    background:#eff6ff;
+
+}
+
+
+.document.active {
+
+    background:#dbeafe;
+
+    border-color:#93c5fd;
+
+}
+
+
+.document-title {
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+
+.document-meta {
+
+    font-size:12px;
+
+    color:var(--muted);
+
+    margin-top:4px;
+
+}
+
+
+.tag {
+
+    display:inline-block;
+
+    background:#eef2ff;
+
+    color:#4338ca;
+
+    font-size:11px;
+
+    padding:3px 8px;
+
+    border-radius:20px;
+
+    margin-top:6px;
+
+}
+
+
+/* =====================
+ MAIN WORKSPACE
+===================== */
+
+
+.workspace {
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+.header {
+
+    height:70px;
+
+    background:white;
+
+    border-bottom:1px solid var(--border);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 24px;
+
+}
+
+
+.search {
+
+    width:420px;
+
+    padding:12px 16px;
+
+    border:
+
+    1px solid var(--border);
+
+    border-radius:10px;
+
+}
+
+
+.header-actions {
+
+    display:flex;
+
+    gap:12px;
+
+}
+
+
+.button {
+
+    padding:10px 16px;
+
+    border-radius:10px;
+
+    border:none;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+}
+
+
+.primary {
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+
+.secondary {
+
+    background:#f1f5f9;
+
+}
+
+
+/* =====================
+CHAT AREA
+===================== */
+
+
+.chat {
+
+    flex:1;
+
+    overflow:auto;
+
+    padding:30px;
+
+}
+
+
+.message {
+
+    margin-bottom:24px;
+
+}
+
+
+.message.user {
+
+    text-align:right;
+
+}
+
+
+.bubble {
+
+    display:inline-block;
+
+    max-width:75%;
+
+    padding:16px;
+
+    border-radius:14px;
+
+    line-height:1.6;
+
+}
+
+
+.user .bubble {
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+
+.assistant .bubble {
+
+    background:white;
+
+    border:1px solid var(--border);
+
+}
+
+
+/* =====================
+ INPUT
+===================== */
+
+
+.composer {
+
+    padding:18px;
+
+    background:white;
+
+    border-top:1px solid var(--border);
+
+    display:flex;
+
+    gap:12px;
+
+}
+
+
+textarea {
+
+    flex:1;
+
+    height:70px;
+
+    resize:none;
+
+    border:
+
+    1px solid var(--border);
+
+    border-radius:12px;
+
+    padding:14px;
+
+}
+
+
+/* =====================
+ RIGHT PANEL
+===================== */
+
+
+.evidence {
+
+    background:white;
+
+    border-left:1px solid var(--border);
+
+    overflow:auto;
+
+}
+
+
+.panel-header {
+
+    padding:20px;
+
+    border-bottom:1px solid var(--border);
+
+    font-weight:700;
+
+}
+
+
+.panel-section {
+
+    padding:20px;
+
+}
+
+
+.card {
+
+    background:#f8fafc;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    padding:16px;
+
+    margin-bottom:16px;
+
+}
+
+
+.card-title {
+
+    font-weight:700;
+
+    margin-bottom:10px;
+
+}
+
+
+.score {
+
+    color:#2563eb;
+
+    font-weight:700;
+
+}
+
+
+.figure-preview {
+
+    height:160px;
+
+    border-radius:10px;
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #dbeafe,
+        #ede9fe
+    );
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:#4338ca;
+
+}
+
+
+/* MOBILE */
+
+@media(max-width:1100px){
+
+.app {
+
+grid-template-columns:
+260px
+1fr;
+
+}
+
+.evidence {
+
+display:none;
+
+}
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+<!-- =====================
+SIDEBAR
+===================== -->
+
+<aside class="sidebar">
+
+
+<div class="brand">
+
+<div class="logo">
+R
+</div>
+
+<h1>
+ResearchRAG
+</h1>
+
+</div>
+
+
+<div class="library">
+
+
+<div class="section-title">
+Collections
+</div>
+
+
+<div class="collection">
+
+
+<div class="collection-title">
+AI Research
+<span>▼</span>
+</div>
+
+
+<div class="document active">
+
+<div class="document-title">
+Transformer Optimization.pdf
+</div>
+
+<div class="document-meta">
+52 pages • Indexed
+</div>
+
+<div class="tag">
+Transformer
+</div>
+
+<div class="tag">
+Attention
+</div>
+
+</div>
+
+
+
+<div class="document">
+
+<div class="document-title">
+Vision Language Models.pdf
+</div>
+
+<div class="document-meta">
+88 pages • Processing
+</div>
+
+<div class="tag">
+VLM
+</div>
+
+</div>
+
+
+
+</div>
+
+
+
+<div class="collection">
+
+
+<div class="collection-title">
+
+RAG Research
+
+<span>
+▼
+</span>
+
+</div>
+
+
+<div class="document">
+
+<div class="document-title">
+Multimodal RAG Benchmark.pdf
+</div>
+
+<div class="document-meta">
+64 pages • Queued
+</div>
+
+</div>
+
+
+</div>
+
+
+<button class="button primary">
++ Upload PDF
+</button>
+
+
+</div>
+
+
+</aside>
+
+
+
+<!-- =====================
+WORKSPACE
+===================== -->
+
+
+<section class="workspace">
+
+
+<header class="header">
+
+
+<input 
+class="search"
+placeholder="Search papers, figures, equations..."
+>
+
+
+<div class="header-actions">
+
+<button class="button secondary">
+Compare
+</button>
+
+
+<button class="button secondary">
+☾
+</button>
+
+
+</div>
+
+
+</header>
+
+
+
+<div class="chat">
+
+
+<div class="message user">
+
+<div class="bubble">
+
+How does the proposed architecture compare with the Transformer baseline shown in Figure 4?
+
+</div>
+
+</div>
+
+
+
+<div class="message assistant">
+
+<div class="bubble">
+
+
+The proposed architecture converges faster than the Transformer baseline.
+
+Figure 4 shows improved optimization stability after epoch 12.
+
+Table 3 confirms:
+
+<ul>
+
+<li>
+18% lower latency
+</li>
+
+<li>
+1.8% higher accuracy
+</li>
+
+</ul>
+
+
+<br>
+
+
+<span style="color:#2563eb">
+
+[Source: Section 4.2, Figure 4]
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<div class="composer">
+
+
+<textarea placeholder="Ask a research question..."></textarea>
+
+
+<button class="button primary">
+Send
+</button>
+
+
+</div>
+
+
+
+</section>
+
+
+
+<!-- =====================
+EVIDENCE PANEL
+===================== -->
+
+
+<aside class="evidence">
+
+
+<div class="panel-header">
+Evidence Explorer
+</div>
+
+
+<div class="panel-section">
+
+
+<div class="card">
+
+<div class="card-title">
+Retrieved Figure
+</div>
+
+
+<div class="figure-preview">
+
+Figure 4 Preview
+
+</div>
+
+
+<br>
+
+Similarity:
+
+<span class="score">
+0.97
+</span>
+
+
+</div>
+
+
+
+<div class="card">
+
+<div class="card-title">
+Retrieved Table
+</div>
+
+
+Model Comparison
+
+<br><br>
+
+
+Transformer
+&nbsp;&nbsp;
+42ms
+
+
+<br>
+
+
+Proposed
+&nbsp;&nbsp;
+34ms
+
+
+</div>
+
+
+<div class="card">
+
+<div class="card-title">
+Retrieval Diagnostics
+</div>
+
+
+Dense Search ✓
+
+<br>
+
+BM25 Search ✓
+
+<br>
+
+Hybrid Score:
+<span class="score">
+0.96
+</span>
+
+
+<br>
+
+Latency:
+1.08s
+
+
+</div>
+
+
+
+</div>
+
+
+</aside>
+
+
+
+</div>
+
+<!-- ==============================
+ PART 2
+ PDF VIEWER + CITATION SYNCHRONIZATION
+================================ -->
+
+<style>
+
+/* PDF VIEWER */
+
+.pdf-viewer-container {
+
+    display:none;
+
+    position:absolute;
+
+    inset:70px 390px 0 280px;
+
+    background:#e5e7eb;
+
+    z-index:20;
+
+}
+
+
+.pdf-toolbar {
+
+    height:52px;
+
+    background:white;
+
+    border-bottom:1px solid #d1d5db;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 16px;
+
+}
+
+
+.pdf-controls button {
+
+    border:none;
+
+    background:#f1f5f9;
+
+    padding:7px 12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+
+.pdf-layout {
+
+    display:flex;
+
+    height:calc(100% - 52px);
+
+}
+
+
+/* PAGE THUMBNAILS */
+
+
+.page-list {
+
+    width:130px;
+
+    background:white;
+
+    border-right:1px solid #d1d5db;
+
+    overflow:auto;
+
+    padding:12px;
+
+}
+
+
+.page-thumb {
+
+    height:140px;
+
+    background:white;
+
+    border:
+
+    1px solid #d1d5db;
+
+    margin-bottom:12px;
+
+    border-radius:6px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    cursor:pointer;
+
+    font-size:13px;
+
+}
+
+
+.page-thumb.active {
+
+    border:2px solid #2563eb;
+
+}
+
+
+/* PDF PAGE */
+
+
+.pdf-area {
+
+    flex:1;
+
+    overflow:auto;
+
+    display:flex;
+
+    justify-content:center;
+
+    padding:30px;
+
+}
+
+
+.pdf-page {
+
+    width:720px;
+
+    height:920px;
+
+    background:white;
+
+    position:relative;
+
+    box-shadow:
+    0 5px 20px rgba(0,0,0,.15);
+
+}
+
+
+.page-number {
+
+    position:absolute;
+
+    top:20px;
+
+    left:25px;
+
+    color:#64748b;
+
+}
+
+
+/* TEXT BLOCK */
+
+.pdf-text {
+
+    position:absolute;
+
+    left:80px;
+
+    top:100px;
+
+    width:560px;
+
+    line-height:1.7;
+
+    color:#334155;
+
+}
+
+
+/* HIGHLIGHTS */
+
+
+.highlight {
+
+    position:absolute;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}
+
+
+.text-highlight {
+
+    background:
+    rgba(59,130,246,.25);
+
+    border:
+
+    2px solid #2563eb;
+
+}
+
+
+.figure-highlight {
+
+    background:
+    rgba(139,92,246,.25);
+
+    border:
+
+    2px solid #7c3aed;
+
+}
+
+
+.table-highlight {
+
+    background:
+    rgba(16,185,129,.25);
+
+    border:
+
+    2px solid #10b981;
+
+}
+
+
+.highlight:hover {
+
+    opacity:.7;
+
+}
+
+
+/* SOURCE DRAWER */
+
+
+.source-drawer {
+
+    position:absolute;
+
+    right:0;
+
+    top:0;
+
+    width:360px;
+
+    height:100%;
+
+    background:white;
+
+    border-left:
+
+    1px solid #d1d5db;
+
+    padding:20px;
+
+    overflow:auto;
+
+}
+
+
+.source-item {
+
+    padding:14px;
+
+    border-radius:10px;
+
+    background:#f8fafc;
+
+    border:1px solid #e5e7eb;
+
+    margin-bottom:12px;
+
+    cursor:pointer;
+
+}
+
+
+.source-item:hover {
+
+    background:#eff6ff;
+
+}
+
+
+.source-score {
+
+    color:#2563eb;
+
+    font-weight:bold;
+
+}
+
+
+.active-source {
+
+    border:
+
+    2px solid #2563eb;
+
+}
+
+
+
+</style>
+
+
+
+<!-- PDF VIEWER OVERLAY -->
+
+<div id="pdfViewer"
+class="pdf-viewer-container">
+
+
+<div class="pdf-toolbar">
+
+
+<div>
+
+<button onclick="closePDF()">
+← Back
+</button>
+
+
+<button>
+Page 18 / 52
+</button>
+
+
+</div>
+
+
+
+<div class="pdf-controls">
+
+
+<button>
+−
+</button>
+
+
+<button>
+100%
+</button>
+
+
+<button>
++
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
+
+<div class="pdf-layout">
+
+
+<!-- PAGE LIST -->
+
+
+<div class="page-list">
+
+
+<div class="page-thumb">
+16
+</div>
+
+
+<div class="page-thumb">
+17
+</div>
+
+
+<div class="page-thumb active">
+18
+</div>
+
+
+<div class="page-thumb">
+19
+</div>
+
+
+<div class="page-thumb">
+20
+</div>
+
+
+</div>
+
+
+
+
+<!-- PDF PAGE -->
+
+
+<div class="pdf-area">
+
+
+<div class="pdf-page">
+
+
+<div class="page-number">
+Page 18
+</div>
+
+
+
+<div class="pdf-text">
+
+
+<h3>
+4.2 Experimental Results
+</h3>
+
+
+<br>
+
+
+<p>
+
+The proposed architecture demonstrates
+faster convergence compared with the
+Transformer baseline.
+
+</p>
+
+
+<br>
+
+
+<p>
+
+The loss curve indicates improved
+optimization stability after epoch 12.
+
+</p>
+
+
+<br>
+
+
+<p>
+
+Latency experiments confirm reduced
+inference cost.
+
+</p>
+
+
+
+</div>
+
+
+
+<!-- TEXT SOURCE -->
+
+<div
+
+class="highlight text-highlight"
+
+style="
+top:220px;
+left:90px;
+width:520px;
+height:70px;
+"
+
+onclick="selectEvidence('chunk-018')">
+
+</div>
+
+
+
+<!-- FIGURE -->
+
+
+<div
+
+class="highlight figure-highlight"
+
+style="
+top:400px;
+left:100px;
+width:500px;
+height:240px;
+"
+
+onclick="selectEvidence('fig-004')">
+
+
+</div>
+
+
+
+<!-- TABLE -->
+
+
+<div
+
+class="highlight table-highlight"
+
+style="
+top:680px;
+left:120px;
+width:480px;
+height:100px;
+"
+
+onclick="selectEvidence('tbl-003')">
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- SOURCE PANEL -->
+
+
+<div class="source-drawer">
+
+
+<h3>
+Retrieved Evidence
+</h3>
+
+
+<br>
+
+
+<div
+
+class="source-item active-source"
+
+onclick="selectEvidence('chunk-018')">
+
+
+<b>
+Text Chunk
+</b>
+
+
+<br>
+
+Section 4.2
+
+<br>
+
+
+Similarity:
+
+<span class="source-score">
+0.97
+</span>
+
+
+</div>
+
+
+
+<div
+
+class="source-item"
+
+onclick="selectEvidence('fig-004')">
+
+
+<b>
+Figure 4
+</b>
+
+
+<br>
+
+
+Training Loss Comparison
+
+
+<br>
+
+
+Similarity:
+
+<span class="source-score">
+0.97
+</span>
+
+
+</div>
+
+
+
+<div
+
+class="source-item"
+
+onclick="selectEvidence('tbl-003')">
+
+
+<b>
+Table 3
+</b>
+
+
+<br>
+
+
+Latency Benchmark
+
+
+<br>
+
+
+Similarity:
+
+<span class="source-score">
+0.93
+</span>
+
+
+</div>
+
+
+
+<div class="source-item">
+
+
+<b>
+Equation 12
+</b>
+
+
+<br>
+
+
+\[
+Ax=b
+\]
+
+
+Similarity:
+
+<span class="source-score">
+0.91
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+<script>
+
+
+/*
+===============================
+PDF SYNCHRONIZATION LOGIC
+===============================
+*/
+
+
+function openPDF(){
+
+    document
+    .getElementById("pdfViewer")
+    .style.display="block";
+
+}
+
+
+
+function closePDF(){
+
+    document
+    .getElementById("pdfViewer")
+    .style.display="none";
+
+}
+
+
+
+const evidenceMap={
+
+
+"chunk-018":{
+
+title:"Section 4.2 Text",
+target:"text-highlight"
+
+},
+
+
+"fig-004":{
+
+title:"Figure 4",
+target:"figure-highlight"
+
+},
+
+
+"tbl-003":{
+
+title:"Table 3",
+target:"table-highlight"
+
+}
+
+
+};
+
+
+
+function selectEvidence(id){
+
+
+const item=evidenceMap[id];
+
+
+if(!item)
+return;
+
+
+
+document
+.querySelectorAll(".highlight")
+.forEach(
+x=>x.style.opacity="0.3"
+);
+
+
+
+const element=
+document.querySelector(
+"." + item.target
+);
+
+
+
+if(element){
+
+
+element.style.opacity="1";
+
+
+element.scrollIntoView({
+
+behavior:"smooth",
+
+block:"center"
+
+});
+
+
+}
+
+
+
+document
+.querySelectorAll(".source-item")
+.forEach(
+x=>x.classList.remove(
+"active-source"
+)
+);
+
+
+
+event?.currentTarget
+?.classList
+.add(
+"active-source"
+);
+
+
+
+}
+
+
+
+// expose for chat citations
+
+
+document
+.querySelectorAll(
+".citation"
+)
+.forEach(
+item=>{
+
+item.onclick=openPDF;
+
+}
+);
+
+
+</script>
+
+<!-- ==========================================
+PART 3
+
+DOCUMENT UPLOAD WORKFLOW
++
+MULTI DOCUMENT COMPARISON MODE
+
+========================================== -->
+
+
+<style>
+
+
+/* =========================
+UPLOAD MODAL
+========================= */
+
+
+.modal {
+
+display:none;
+
+position:fixed;
+
+inset:0;
+
+background:
+rgba(15,23,42,.55);
+
+z-index:100;
+
+
+align-items:center;
+
+justify-content:center;
+
+
+}
+
+
+.modal-card {
+
+
+width:620px;
+
+background:white;
+
+border-radius:18px;
+
+padding:28px;
+
+box-shadow:
+
+0 25px 50px rgba(0,0,0,.2);
+
+
+}
+
+
+
+.modal-title {
+
+
+font-size:22px;
+
+font-weight:700;
+
+margin-bottom:20px;
+
+
+}
+
+
+
+.drop-zone {
+
+
+height:180px;
+
+border:
+
+2px dashed #93c5fd;
+
+
+border-radius:16px;
+
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+
+flex-direction:column;
+
+
+background:#eff6ff;
+
+
+cursor:pointer;
+
+
+}
+
+
+.drop-zone:hover {
+
+
+background:#dbeafe;
+
+
+}
+
+
+
+.upload-item {
+
+
+margin-top:20px;
+
+
+padding:16px;
+
+
+border-radius:12px;
+
+
+background:#f8fafc;
+
+
+border:1px solid #e5e7eb;
+
+
+}
+
+
+
+.progress {
+
+
+height:10px;
+
+background:#e5e7eb;
+
+
+border-radius:20px;
+
+
+overflow:hidden;
+
+
+margin-top:10px;
+
+
+}
+
+
+.progress-bar {
+
+
+height:100%;
+
+background:#2563eb;
+
+
+transition:.4s;
+
+
+}
+
+
+
+.status-row {
+
+
+display:flex;
+
+justify-content:space-between;
+
+
+font-size:13px;
+
+margin-top:10px;
+
+
+}
+
+
+.status-success {
+
+color:#10b981;
+
+font-weight:700;
+
+}
+
+
+
+.status-processing {
+
+color:#2563eb;
+
+font-weight:700;
+
+}
+
+
+
+/* =========================
+COMPARISON MODE
+========================= */
+
+
+.compare-view {
+
+
+display:none;
+
+
+position:absolute;
+
+
+inset:70px 0 0 0;
+
+
+background:#f8fafc;
+
+
+z-index:30;
+
+
+}
+
+
+
+.compare-header {
+
+
+height:60px;
+
+background:white;
+
+
+border-bottom:
+
+1px solid #e5e7eb;
+
+
+display:flex;
+
+
+align-items:center;
+
+
+justify-content:space-between;
+
+
+padding:0 25px;
+
+
+}
+
+
+
+.compare-body {
+
+
+display:grid;
+
+
+grid-template-columns:
+
+1fr
+
+1fr
+
+300px;
+
+
+height:calc(100% - 60px);
+
+
+}
+
+
+
+.compare-doc {
+
+
+background:white;
+
+
+margin:20px;
+
+
+padding:20px;
+
+
+border-radius:14px;
+
+
+border:1px solid #e5e7eb;
+
+
+overflow:auto;
+
+
+}
+
+
+
+.compare-doc h3 {
+
+
+margin-bottom:15px;
+
+
+}
+
+
+
+.finding {
+
+
+padding:14px;
+
+
+background:#f8fafc;
+
+
+border-radius:10px;
+
+
+margin-bottom:12px;
+
+
+}
+
+
+
+.common {
+
+
+border-left:
+
+4px solid #10b981;
+
+
+}
+
+
+
+.difference {
+
+
+border-left:
+
+4px solid #ef4444;
+
+
+}
+
+
+
+.consensus-panel {
+
+
+background:white;
+
+
+border-left:
+
+1px solid #e5e7eb;
+
+
+padding:20px;
+
+
+overflow:auto;
+
+
+}
+
+
+
+.badge {
+
+
+display:inline-block;
+
+
+padding:5px 10px;
+
+
+border-radius:20px;
+
+
+font-size:12px;
+
+
+background:#eef2ff;
+
+
+color:#4338ca;
+
+
+}
+
+
+
+</style>
+
+
+
+
+
+
+<!-- =================================
+UPLOAD MODAL
+================================= -->
+
+
+<div id="uploadModal"
+
+class="modal">
+
+
+<div class="modal-card">
+
+
+<div class="modal-title">
+
+Upload Research Documents
+
+</div>
+
+
+
+<div class="drop-zone">
+
+
+<div style="font-size:40px">
+
+📄
+
+</div>
+
+
+Drag PDF files here
+
+
+<br>
+
+
+<span style="color:#64748b">
+
+or click to browse
+
+</span>
+
+
+</div>
+
+
+
+
+
+<div class="upload-item">
+
+
+<b>
+
+Transformer Optimization.pdf
+
+</b>
+
+
+<div class="status-row">
+
+
+<span>
+
+Layout Parsing
+
+</span>
+
+
+<span class="status-processing">
+
+82%
+
+</span>
+
+
+</div>
+
+
+
+<div class="progress">
+
+<div
+
+class="progress-bar"
+
+style="width:82%">
+
+</div>
+
+</div>
+
+
+
+<div class="status-row">
+
+<span>
+
+✓ OCR Extraction
+
+</span>
+
+
+<span>
+
+✓ Figure Detection
+
+</span>
+
+
+</div>
+
+
+
+<div class="status-row">
+
+
+<span>
+
+Embedding Generation
+
+</span>
+
+
+<span class="status-processing">
+
+Running
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div class="upload-item">
+
+
+<b>
+
+Vision Language Models.pdf
+
+</b>
+
+
+
+<div class="status-row">
+
+
+<span>
+
+Completed
+
+</span>
+
+
+<span class="status-success">
+
+Indexed
+
+</span>
+
+
+</div>
+
+
+<div class="progress">
+
+<div
+
+class="progress-bar"
+
+style="width:100%;background:#10b981">
+
+</div>
+
+</div>
+
+
+</div>
+
+
+
+
+
+<br>
+
+
+<button
+
+class="button secondary"
+
+onclick="closeUpload()">
+
+Close
+
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<!-- =================================
+COMPARE MODE
+================================= -->
+
+
+<div id="compareView"
+
+class="compare-view">
+
+
+<div class="compare-header">
+
+
+<h3>
+
+Document Comparison
+
+</h3>
+
+
+
+<button
+
+class="button secondary"
+
+onclick="closeCompare()">
+
+← Back
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="compare-body">
+
+
+
+<div class="compare-doc">
+
+
+<h3>
+
+Transformer Optimization
+
+</h3>
+
+
+<span class="badge">
+
+52 pages
+
+</span>
+
+
+<br><br>
+
+
+<div class="finding common">
+
+
+<b>
+
+Finding
+
+</b>
+
+
+Both architectures improve convergence through optimized attention mechanisms.
+
+</div>
+
+
+
+<div class="finding">
+
+
+<b>
+
+Performance
+
+</b>
+
+
+Latency:
+
+42ms
+
+
+<br>
+
+
+Accuracy:
+
+91.8%
+
+
+</div>
+
+
+
+<div class="finding">
+
+
+<b>
+
+Evidence
+
+</b>
+
+
+Figure 4
+
+<br>
+
+Table 3
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="compare-doc">
+
+
+<h3>
+
+Vision Language Models Survey
+
+</h3>
+
+
+<span class="badge">
+
+88 pages
+
+</span>
+
+
+<br><br>
+
+
+
+
+<div class="finding common">
+
+
+<b>
+
+Finding
+
+</b>
+
+
+Vision-language models improve multimodal reasoning by aligning image and text representations.
+
+</div>
+
+
+
+
+<div class="finding">
+
+
+<b>
+
+Performance
+
+</b>
+
+
+Latency:
+
+35ms
+
+
+<br>
+
+
+Accuracy:
+
+93.2%
+
+
+</div>
+
+
+
+<div class="finding">
+
+
+<b>
+
+Evidence
+
+</b>
+
+
+Figure 7
+
+<br>
+
+Benchmark Table 5
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="consensus-panel">
+
+
+<h3>
+
+Analysis
+
+</h3>
+
+
+<br>
+
+
+
+<div class="finding common">
+
+
+<b>
+
+Consensus
+
+</b>
+
+
+<br>
+
+
+Both papers report improved multimodal retrieval accuracy.
+
+</div>
+
+
+
+<div class="finding difference">
+
+
+<b>
+
+Difference
+
+</b>
+
+
+<br>
+
+
+Paper A focuses on transformer optimization.
+
+<br>
+
+Paper B focuses on vision-language alignment.
+
+</div>
+
+
+
+
+<div class="finding">
+
+
+<b>
+
+AI Summary
+
+</b>
+
+
+<br><br>
+
+
+The two documents approach efficiency from different directions:
+architecture optimization versus multimodal representation learning.
+
+</div>
+
+
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<script>
+
+
+/* ======================
+UPLOAD HANDLERS
+====================== */
+
+
+function openUpload(){
+
+
+document
+.getElementById(
+"uploadModal"
+)
+.style.display="flex";
+
+
+}
+
+
+
+function closeUpload(){
+
+
+document
+.getElementById(
+"uploadModal"
+)
+.style.display="none";
+
+
+}
+
+
+
+
+/* ======================
+COMPARE HANDLERS
+====================== */
+
+
+function openCompare(){
+
+
+document
+.getElementById(
+"compareView"
+)
+.style.display="block";
+
+
+}
+
+
+
+function closeCompare(){
+
+
+document
+.getElementById(
+"compareView"
+)
+.style.display="none";
+
+
+}
+
+
+
+
+
+
+/* simulate ingestion */
+
+
+function simulateUpload(){
+
+
+let progress=0;
+
+
+let timer=setInterval(()=>{
+
+
+progress+=10;
+
+
+console.log(
+
+"Ingestion:",
+
+progress+"%"
+
+);
+
+
+
+if(progress>=100)
+
+clearInterval(timer);
+
+
+
+},500);
+
+
+}
+
+
+</script>
+
+<!-- ==========================================
+PART 4
+
+ADMIN DASHBOARD
++
+INGESTION MONITORING
++
+MODEL CONFIGURATION
+
+========================================== -->
+
+
+<style>
+
+
+/* =============================
+ADMIN VIEW
+============================= */
+
+
+.admin-view {
+
+
+display:none;
+
+
+position:absolute;
+
+
+inset:70px 0 0 0;
+
+
+background:#f8fafc;
+
+
+z-index:40;
+
+
+overflow:auto;
+
+
+}
+
+
+
+.admin-header {
+
+
+height:65px;
+
+
+background:white;
+
+
+border-bottom:
+
+1px solid #e5e7eb;
+
+
+display:flex;
+
+
+align-items:center;
+
+
+justify-content:space-between;
+
+
+padding:0 25px;
+
+
+}
+
+
+
+.admin-grid {
+
+
+padding:25px;
+
+
+display:grid;
+
+
+grid-template-columns:
+
+repeat(4,1fr);
+
+
+gap:18px;
+
+
+}
+
+
+
+.metric-card {
+
+
+background:white;
+
+
+border:
+
+1px solid #e5e7eb;
+
+
+border-radius:16px;
+
+
+padding:20px;
+
+
+}
+
+
+
+.metric-title {
+
+
+font-size:13px;
+
+
+color:#64748b;
+
+
+}
+
+
+
+.metric-value {
+
+
+font-size:32px;
+
+
+font-weight:800;
+
+
+margin-top:8px;
+
+
+}
+
+
+
+.metric-success {
+
+
+color:#10b981;
+
+
+}
+
+
+
+.metric-warning {
+
+
+color:#f59e0b;
+
+
+}
+
+
+
+.metric-danger {
+
+
+color:#ef4444;
+
+
+}
+
+
+
+
+
+/* JOB TABLE */
+
+
+.admin-panel {
+
+
+background:white;
+
+
+border:
+
+1px solid #e5e7eb;
+
+
+border-radius:16px;
+
+
+margin:25px;
+
+
+padding:22px;
+
+
+}
+
+
+
+table {
+
+
+width:100%;
+
+
+border-collapse:collapse;
+
+
+}
+
+
+
+th {
+
+
+text-align:left;
+
+
+padding:12px;
+
+
+font-size:13px;
+
+
+color:#64748b;
+
+
+border-bottom:
+
+1px solid #e5e7eb;
+
+
+}
+
+
+
+td {
+
+
+padding:14px;
+
+
+border-bottom:
+
+1px solid #f1f5f9;
+
+
+}
+
+
+
+.progress-small {
+
+
+height:8px;
+
+
+width:160px;
+
+
+background:#e5e7eb;
+
+
+border-radius:20px;
+
+
+overflow:hidden;
+
+
+}
+
+
+
+.progress-small div {
+
+
+height:100%;
+
+
+background:#2563eb;
+
+
+}
+
+
+
+
+
+/* CONFIGURATION */
+
+
+.config-grid {
+
+
+display:grid;
+
+
+grid-template-columns:
+
+1fr
+
+1fr
+
+1fr;
+
+
+gap:20px;
+
+
+}
+
+
+
+.config-card {
+
+
+background:#f8fafc;
+
+
+border-radius:14px;
+
+
+padding:18px;
+
+
+}
+
+
+
+.config-row {
+
+
+display:flex;
+
+
+justify-content:space-between;
+
+
+padding:10px 0;
+
+
+border-bottom:
+
+1px solid #e5e7eb;
+
+
+font-size:14px;
+
+
+}
+
+
+
+.status-dot {
+
+
+width:10px;
+
+
+height:10px;
+
+
+border-radius:50%;
+
+
+display:inline-block;
+
+
+background:#10b981;
+
+
+margin-right:8px;
+
+
+}
+
+
+
+
+
+</style>
+
+
+
+
+
+
+<!-- =================================
+ADMIN PAGE
+================================= -->
+
+
+
+<div id="adminView"
+
+class="admin-view">
+
+
+
+<div class="admin-header">
+
+
+<h2>
+
+System Administration
+
+</h2>
+
+
+
+<button
+
+class="button secondary"
+
+onclick="closeAdmin()">
+
+← Back
+
+</button>
+
+
+</div>
+
+
+
+
+
+<!-- METRICS -->
+
+
+<div class="admin-grid">
+
+
+
+<div class="metric-card">
+
+
+<div class="metric-title">
+
+Documents Indexed
+
+</div>
+
+
+<div class="metric-value">
+
+5,672
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="metric-card">
+
+
+<div class="metric-title">
+
+Vector Records
+
+</div>
+
+
+<div class="metric-value">
+
+1.8M
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div class="metric-card">
+
+
+<div class="metric-title">
+
+GPU Utilization
+
+</div>
+
+
+<div class="metric-value metric-success">
+
+63%
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div class="metric-card">
+
+
+<div class="metric-title">
+
+Storage Used
+
+</div>
+
+
+<div class="metric-value">
+
+128GB
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- INGESTION JOBS -->
+
+
+<div class="admin-panel">
+
+
+<h3>
+
+Ingestion Jobs
+
+</h3>
+
+
+<br>
+
+
+
+<table>
+
+
+<thead>
+
+<tr>
+
+<th>
+
+Document
+
+</th>
+
+
+<th>
+
+Stage
+
+</th>
+
+
+<th>
+
+Progress
+
+</th>
+
+
+<th>
+
+Status
+
+</th>
+
+
+</tr>
+
+</thead>
+
+
+
+<tbody>
+
+
+<tr>
+
+<td>
+
+Transformer Optimization.pdf
+
+</td>
+
+
+<td>
+
+Embedding Generation
+
+</td>
+
+
+<td>
+
+
+<div class="progress-small">
+
+<div style="width:82%">
+
+</div>
+
+</div>
+
+
+</td>
+
+
+<td>
+
+<span class="status-dot">
+
+</span>
+
+Running
+
+</td>
+
+
+</tr>
+
+
+
+
+
+
+<tr>
+
+
+<td>
+
+VLM Survey.pdf
+
+</td>
+
+
+<td>
+
+Vector Indexing
+
+</td>
+
+
+<td>
+
+
+<div class="progress-small">
+
+<div style="width:100%;background:#10b981">
+
+</div>
+
+</div>
+
+
+</td>
+
+
+<td>
+
+<span class="status-dot">
+
+</span>
+
+
+Completed
+
+</td>
+
+
+</tr>
+
+
+
+
+
+<tr>
+
+
+<td>
+
+Medical AI Review.pdf
+
+</td>
+
+
+<td>
+
+Queued
+
+</td>
+
+
+<td>
+
+
+<div class="progress-small">
+
+<div style="width:0%">
+
+</div>
+
+</div>
+
+
+</td>
+
+
+<td>
+
+Waiting
+
+</td>
+
+
+</tr>
+
+
+
+</tbody>
+
+
+</table>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- SYSTEM CONFIGURATION -->
+
+
+
+<div class="admin-panel">
+
+
+<h3>
+
+Model & Infrastructure Configuration
+
+</h3>
+
+
+<br>
+
+
+
+
+<div class="config-grid">
+
+
+
+
+
+<div class="config-card">
+
+
+<h4>
+
+Document Parsing
+
+</h4>
+
+
+
+<div class="config-row">
+
+
+Parser
+
+<span>
+
+MinerU
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+OCR Engine
+
+<span>
+
+DocLayout-YOLO
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+Formula Parser
+
+<span>
+
+LaTeX OCR
+
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="config-card">
+
+
+<h4>
+
+Embedding Pipeline
+
+</h4>
+
+
+
+<div class="config-row">
+
+
+Dense Model
+
+<span>
+
+BGE-M3
+
+</span>
+
+
+</div>
+
+
+
+
+<div class="config-row">
+
+
+Sparse Search
+
+<span>
+
+BM25
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+Vector DB
+
+<span>
+
+Qdrant
+
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="config-card">
+
+
+<h4>
+
+Generation Models
+
+</h4>
+
+
+
+<div class="config-row">
+
+
+VLM
+
+<span>
+
+GPT-4o
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+Fallback
+
+<span>
+
+Qwen2-VL
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+Context Window
+
+<span>
+
+128K
+
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- VECTOR DB STATUS -->
+
+
+
+<div class="admin-panel">
+
+
+<h3>
+
+Vector Database Monitoring
+
+</h3>
+
+
+<br>
+
+
+
+<div class="config-grid">
+
+
+
+<div class="config-card">
+
+
+<h4>
+
+Qdrant Cluster
+
+</h4>
+
+
+
+<div class="config-row">
+
+
+Status
+
+<span>
+
+🟢 Healthy
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+Collections
+
+<span>
+
+12
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+Replicas
+
+<span>
+
+3
+
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="config-card">
+
+
+<h4>
+
+Search Performance
+
+</h4>
+
+
+
+<div class="config-row">
+
+
+Average Query
+
+<span>
+
+1.08s
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+Dense Search
+
+<span>
+
+420ms
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+BM25 Search
+
+<span>
+
+110ms
+
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="config-card">
+
+
+<h4>
+
+Workers
+
+</h4>
+
+
+
+<div class="config-row">
+
+
+Parser Workers
+
+<span>
+
+4
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+VLM Workers
+
+<span>
+
+2
+
+</span>
+
+
+</div>
+
+
+
+<div class="config-row">
+
+
+Embedding Workers
+
+<span>
+
+6
+
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<script>
+
+
+function openAdmin(){
+
+
+document
+
+.getElementById(
+"adminView"
+)
+
+.style.display="block";
+
+
+}
+
+
+
+function closeAdmin(){
+
+
+document
+
+.getElementById(
+"adminView"
+)
+
+.style.display="none";
+
+
+}
+
+
+
+</script>
+
+<script>
+
+/*
+====================================================
+ResearchRAG Prototype Application Controller
+====================================================
+*/
+
+
+const AppState = {
+
+
+documents: [],
+
+citations: [],
+
+retrieval: null,
+
+
+activeDocument:null,
+
+theme:"light",
+
+
+chatHistory:[]
+
+
+};
+
+
+
+
+
+/*
+====================================================
+LOAD MOCK DATA
+====================================================
+*/
+
+
+async function loadMockData(){
+
+
+try{
+
+
+const docs =
+await fetch(
+"mock-data/documents.json"
+)
+.then(r=>r.json());
+
+
+const retrieval =
+await fetch(
+"mock-data/retrieval.json"
+)
+.then(r=>r.json());
+
+
+const citations =
+await fetch(
+"mock-data/citations.json"
+)
+.then(r=>r.json());
+
+
+
+AppState.documents =
+docs.documents;
+
+
+AppState.citations =
+citations.citations;
+
+
+AppState.retrieval =
+retrieval;
+
+
+
+console.log(
+"ResearchRAG loaded",
+AppState
+);
+
+
+
+renderDocuments();
+
+
+}
+catch(error){
+
+
+console.warn(
+
+"Mock data unavailable. Using demo state."
+
+);
+
+
+}
+
+
+
+}
+
+
+
+
+/*
+====================================================
+DOCUMENT LIBRARY
+====================================================
+*/
+
+
+function renderDocuments(){
+
+
+const docs =
+document.querySelectorAll(
+".document"
+);
+
+
+docs.forEach(
+(item,index)=>{
+
+
+item.onclick=()=>{
+
+
+selectDocument(
+index
+);
+
+
+};
+
+
+});
+
+
+}
+
+
+
+function selectDocument(index){
+
+
+AppState.activeDocument =
+AppState.documents[index];
+
+
+console.log(
+
+"Selected",
+
+AppState.activeDocument
+
+);
+
+
+
+}
+
+
+
+
+
+/*
+====================================================
+CHAT STREAMING SIMULATION
+====================================================
+*/
+
+
+function sendMessage(){
+
+
+const input =
+document.querySelector(
+".composer textarea"
+);
+
+
+
+const question =
+input.value.trim();
+
+
+
+if(!question)
+return;
+
+
+
+appendMessage(
+
+"user",
+
+question
+
+);
+
+
+
+input.value="";
+
+
+
+streamAnswer();
+
+
+}
+
+
+
+
+
+
+
+function appendMessage(
+role,
+text
+){
+
+
+const chat =
+document.querySelector(
+".chat"
+);
+
+
+
+const div =
+document.createElement(
+"div"
+);
+
+
+
+div.className =
+"message " + role;
+
+
+
+div.innerHTML =
+
+`
+
+<div class="bubble">
+
+${text}
+
+</div>
+
+`;
+
+
+
+chat.appendChild(div);
+
+
+
+chat.scrollTop =
+chat.scrollHeight;
+
+
+}
+
+
+
+
+
+async function streamAnswer(){
+
+
+const answer =
+
+`
+
+The proposed architecture demonstrates improved retrieval quality compared with the Transformer baseline.
+
+<br><br>
+
+The model reduces latency by approximately 18% while maintaining higher accuracy.
+
+<br><br>
+
+<a class="citation"
+onclick="openCitation('fig-004')">
+
+[Source: Section 4.2 Figure 4]
+
+</a>
+
+<br>
+
+<a class="citation"
+onclick="openCitation('tbl-003')">
+
+[Source: Table 3]
+
+</a>
+
+`;
+
+
+
+const container =
+document.createElement(
+"div"
+);
+
+
+
+container.className =
+"message assistant";
+
+
+
+container.innerHTML =
+
+`
+
+<div class="bubble">
+
+<span id="streamText"></span>
+
+</div>
+
+`;
+
+
+
+document
+.querySelector(".chat")
+.appendChild(container);
+
+
+
+const target =
+document
+.getElementById(
+"streamText"
+);
+
+
+
+let index=0;
+
+
+const timer =
+setInterval(()=>{
+
+
+target.innerHTML =
+answer.substring(
+0,
+index
+);
+
+
+index++;
+
+
+if(index>=answer.length)
+
+clearInterval(timer);
+
+
+
+},20);
+
+
+
+}
+
+
+
+
+
+
+
+/*
+====================================================
+CITATION ROUTING
+====================================================
+*/
+
+
+function openCitation(id){
+
+
+openPDF();
+
+
+
+setTimeout(()=>{
+
+
+selectEvidence(id);
+
+
+},300);
+
+
+}
+
+
+
+
+
+
+
+
+/*
+====================================================
+SEARCH
+====================================================
+*/
+
+
+const searchBox =
+document.querySelector(
+".search"
+);
+
+
+
+if(searchBox){
+
+
+searchBox.addEventListener(
+
+"input",
+
+function(e){
+
+
+const term =
+e.target.value
+.toLowerCase();
+
+
+
+document
+.querySelectorAll(
+".document"
+)
+
+.forEach(
+doc=>{
+
+
+doc.style.display =
+
+doc.innerText
+.toLowerCase()
+.includes(term)
+
+?
+
+"block"
+
+:
+
+"none";
+
+
+
+});
+
+
+}
+
+);
+
+
+}
+
+
+
+
+
+
+/*
+====================================================
+DARK MODE
+====================================================
+*/
+
+
+function toggleTheme(){
+
+
+if(
+AppState.theme==="light"
+){
+
+
+document.body.style.background =
+"#020617";
+
+
+document.body.style.color =
+"#e5e7eb";
+
+
+AppState.theme="dark";
+
+
+}
+
+else{
+
+
+document.body.style.background =
+"#f8fafc";
+
+
+document.body.style.color =
+"#111827";
+
+
+AppState.theme="light";
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+/*
+====================================================
+RETRIEVAL DIAGNOSTICS
+====================================================
+*/
+
+
+function showDiagnostics(){
+
+
+if(!AppState.retrieval)
+return;
+
+
+
+const diag =
+AppState.retrieval.diagnostics;
+
+
+
+console.table({
+
+chunks:
+diag.retrievedChunks,
+
+figures:
+diag.retrievedFigures,
+
+tables:
+diag.retrievedTables,
+
+latency:
+AppState.retrieval.retrieval.latencyMs,
+
+score:
+AppState.retrieval.retrieval.hybridScore
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+/*
+====================================================
+UPLOAD SIMULATION
+====================================================
+*/
+
+
+function simulateDocumentUpload(){
+
+
+openUpload();
+
+
+let progress=0;
+
+
+
+const interval =
+setInterval(()=>{
+
+
+progress+=10;
+
+
+
+console.log(
+
+"Ingestion progress",
+
+progress+"%"
+
+);
+
+
+
+if(progress>=100){
+
+
+clearInterval(interval);
+
+
+console.log(
+
+"Document indexed"
+
+);
+
+
+}
+
+
+
+},500);
+
+
+}
+
+
+
+
+
+
+
+
+/*
+====================================================
+KEYBOARD SHORTCUTS
+====================================================
+*/
+
+
+document.addEventListener(
+
+"keydown",
+
+e=>{
+
+
+if(
+e.ctrlKey &&
+e.key==="k"
+){
+
+
+document
+.querySelector(".search")
+.focus();
+
+
+}
+
+
+
+if(
+e.key==="Escape"
+){
+
+
+closePDF();
+
+closeCompare();
+
+closeAdmin();
+
+closeUpload();
+
+
+}
+
+
+
+}
+
+);
+
+
+
+
+
+
+/*
+====================================================
+BUTTON WIRING
+====================================================
+*/
+
+
+document
+.querySelectorAll(
+".button"
+)
+
+.forEach(
+button=>{
+
+
+if(
+button.innerText.includes(
+"Upload"
+)
+){
+
+
+button.onclick =
+simulateDocumentUpload;
+
+
+}
+
+
+
+if(
+button.innerText.includes(
+"Compare"
+)
+){
+
+
+button.onclick =
+openCompare;
+
+
+}
+
+
+
+if(
+button.innerText.includes(
+"☾"
+)
+){
+
+
+button.onclick =
+toggleTheme;
+
+
+}
+
+
+
+}
+
+
+);
+
+
+
+
+
+
+
+/*
+====================================================
+START APPLICATION
+====================================================
+*/
+
+
+loadMockData();
+
+
+</script>
+
+</body>
+
+</html>

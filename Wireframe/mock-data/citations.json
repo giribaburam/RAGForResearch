@@ -1,0 +1,57 @@
+{
+  "citations": [
+    {
+      "id": "cite-001",
+      "documentId": "doc-001",
+      "page": 18,
+      "section": "4.2 Experimental Results",
+      "figure": {
+        "id": "fig-004",
+        "label": "Figure 4",
+        "caption": "Training Loss Comparison",
+        "image": "/assets/figure-preview.png",
+        "boundingBox": {
+          "x": 215,
+          "y": 132,
+          "width": 540,
+          "height": 318
+        }
+      },
+      "linkedParagraphs": [
+        "chunk-018",
+        "chunk-019"
+      ]
+    },
+    {
+      "id": "cite-002",
+      "documentId": "doc-001",
+      "page": 19,
+      "section": "4.2 Experimental Results",
+      "table": {
+        "id": "tbl-003",
+        "label": "Table 3",
+        "title": "Latency Benchmark",
+        "boundingBox": {
+          "x": 180,
+          "y": 410,
+          "width": 520,
+          "height": 250
+        }
+      },
+      "linkedParagraphs": [
+        "chunk-020"
+      ]
+    },
+    {
+      "id": "cite-003",
+      "documentId": "doc-001",
+      "page": 15,
+      "section": "3.1 Model Architecture",
+      "equation": {
+        "id": "eq-012",
+        "label": "Equation 12",
+        "latex": "\\mathbf{A}x=b"
+      }
+    }
+  ]
+}
