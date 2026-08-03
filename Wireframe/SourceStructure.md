@@ -22,3 +22,10 @@ research-rag-ui/
     ├── citations.json
     ├── retrieval.json
     └── documents.json
+
+
+Demo the mock"
+from command prompt run below command to run the server from root folder wireframe
+python -m http.server
+
+browser should load http://localhost/index.html
