@@ -1,1 +1,93 @@
-Building a multimodal Retrieval-Augmented Generation (RAG) system for research is a powerful way to handle complex documents containing text, tables, charts, diagrams, and equations (common in academic papers, technical reports, and whitepapers).Here is a comprehensive design architecture and strategy tailored for a research-focused multimodal RAG system.1. High-Level Architecture OverviewA multimodal RAG pipeline generally follows four main stages:Ingestion & Parsing: Extracting and separating text, images, tables, and formulas from source documents (PDFs, HTML, etc.).Indexing & Embedding: Generating vector embeddings for text and visual data using specialized encoders, then storing them in a vector database.Retrieval: Fetching relevant multimodal context (text chunks, tables, cropped figures) based on a user query.Generation: Feeding the retrieved multimodal context into a Vision-Language Model (VLM) to synthesize an accurate, cited answer.2. Component-by-Component Design IdeasA. Document Ingestion & Parsing (The Foundation)Standard PDF parsers often destroy tables and miss figures. For research papers, you need advanced parsing tools:Tools to consider: Unstructured, LlamaParse, Marker, or MinerU (specifically designed to parse scientific documents, markdown conversion, and extract bounding boxes for figures/tables).Strategy:Extract text into clean markdown chunks.Extract tables and convert them either to HTML/Markdown tables (ideal for text-based LLMs) or render them as images.Crop and save figures/charts with their surrounding captions. Captions are critical because they provide semantic context for the images.B. Embedding & Indexing Strategy (Multimodal Fusion)You have two primary design patterns for handling multimodal data in the vector space:Approach 1: Joint Embedding Space (e.g., CLIP, ColPali)Use a vision-language embedding model like ColPali or CLIP to embed document pages or images directly. ColPali, for instance, allows late-interaction retrieval directly on PDF page images, bypassing text extraction errors entirely.Approach 2: Multi-Index / Hybrid Approach (Recommended for Research)Text Index: Store text chunks and table markdown in a traditional vector database (e.g., Qdrant, Milvus, pgvector) using a text embedder (like OpenAI text-embedding-3 or HuggingFace BGE models).Image/Figure Index: Summarize figures using a VLM (e.g., GPT-4o, Claude 3.5 Sonnet, or Llama-3.2-Vision) to generate descriptive text summaries. Embed those summaries into the vector database, linking back to the original image file path.C. Retrieval StrategiesWhen a researcher asks a question (e.g., "Show me the performance comparison chart in Figure 3 and explain the results"):Metadata & Parent-Child Retrieval: If a text chunk points to a figure or table, retrieve the parent section alongside the visual asset.Multi-Modal Router: Use a lightweight router to determine if the query requires text, visual data, or both.If visual $\rightarrow$ Query the image summary index to retrieve relevant figures/tables.If text $\rightarrow$ Query the standard text index.D. Generation & SynthesisModel Choice: Use a robust Vision-Language Model (VLM) capable of handling interleaved text and images (e.g., GPT-4o, Claude 3.5 Sonnet, or open-source alternatives like Qwen2-VL or Llama-3.2-11B-Vision).Prompt Engineering for Research: Instruct the model to strictly cite sources, reference specific figure/table numbers (e.g., [Source: Paper X, Figure 2]), and handle conflicting information between text and visual data.3. Recommended Technology StackLayerRecommended Tools / FrameworksOrchestrationLlamaIndex or LangChain (both have strong multimodal support)Document ParsingLlamaParse, MinerU, or MarkerVector DatabaseQdrant, Milvus, or Chroma (support multi-vector/multimodal payloads)Embedding ModelsOpenAI, BGE-M3 (multilingual/dense), or ColPali (for visual document retrieval)Generation (VLM)Claude 3.5 Sonnet, GPT-4o, or Qwen2-VL-72B4. Key Challenges to Watch Out ForContext Window Limits: Passing multiple high-resolution research figures and long text snippets can quickly exceed token limits. Use aggressive chunking and selective retrieval (only pass the 1-2 most relevant figures).OCR Quality: Mathematical formulas and complex chemical structures often fail standard OCR. Ensure your parser supports LaTeX extraction for formulas.Hallucination in Visuals: VLMs can sometimes misinterpret complex graphs. Implement a verification step or prompt the model to cross-reference the figure summary text with the visual input.
+# Architecture.md: Multimodal Research RAG System
+
+## 1. Executive Summary
+This document outlines the system architecture for a production-grade **Multimodal Retrieval-Augmented Generation (RAG)** pipeline explicitly designed for academic research, technical papers, and scientific documentation. Standard text-only RAG pipelines fail in this domain because critical domain knowledge is frequently locked inside 2D layouts, mathematical equations, data tables, and architectural charts. 
+
+This architecture adopts a **Hybrid Multimodal Retrieval Strategy** combining layout-aware document chunking, multi-vector/dense embedding schemas, and Vision-Language Model (VLM) synthesis.
+
+---
+
+## 2. System Architecture Diagram
+
+```mermaid
+flowchart TD
+    subgraph Ingestion["1. Document Ingestion & Parsing"]
+        PDF[Research PDFs / Docs] --> Parser[Layout-Aware Parser: MinerU / Docling]
+        Parser --> TextBlock[Clean Markdown Text]
+        Parser --> TableBlock[Tables / Structured Data]
+        Parser --> FigureBlock[Cropped Figures & Diagrams + Captions]
+        Parser --> FormulaBlock[LaTeX Math Formulas]
+    end
+
+    subgraph Indexing["2. Embedding & Multi-Index Storage"]
+        TextBlock --> TextEmbed[Dense Embedder: BGE-M3 / OpenAI]
+        TableBlock --> TableMarkdown[HTML / Markdown Conversion]
+        FigureBlock --> VLMDesc[VLM Summarizer: GPT-4o / Qwen2-VL]
+        
+        TextEmbed --> VectorDB[(Vector Database / Qdrant)]
+        TableMarkdown --> VectorDB
+        VLMDesc --> VectorDB
+        
+        PDF --> PageRaster[Page Rasterizer (Optional ColPali Pipeline)] --> DocStore[(Multi-Vector Store)]
+    end
+
+    subgraph Retrieval["3. Hybrid Multimodal Retrieval"]
+        UserQuery([User Query: Text / Visual Question]) --> QueryRouter{Query Intent Router}
+        QueryRouter -->|Semantic/Keyword| TextSearch[Text k-NN & BM25 Search]
+        QueryRouter -->|Visual/Chart/Table| VisualSearch[Image Summary & Table Vector Search]
+        
+        TextSearch --> ContextAssembler[Context Assembler]
+        VisualSearch --> ContextAssembler
+    end
+
+    subgraph Generation["4. Multimodal Generation & Citation"]
+        ContextAssembler --> Prompt[Interleaved Prompt Construction]
+        Prompt --> VLM[Vision-Language Model: Claude 3.5 Sonnet / GPT-4o]
+        VLM --> FinalOutput([Synthesized Answer with Bounding-Box/Figure Citations])
+    end# Architecture.md: Multimodal Research RAG System
+
+## 1. Executive Summary
+This document outlines the system architecture for a production-grade **Multimodal Retrieval-Augmented Generation (RAG)** pipeline explicitly designed for academic research, technical papers, and scientific documentation. Standard text-only RAG pipelines fail in this domain because critical domain knowledge is frequently locked inside 2D layouts, mathematical equations, data tables, and architectural charts. 
+
+This architecture adopts a **Hybrid Multimodal Retrieval Strategy** combining layout-aware document chunking, multi-vector/dense embedding schemas, and Vision-Language Model (VLM) synthesis.
+
+---
+
+## 2. System Architecture Diagram
+
+```mermaid
+flowchart TD
+    subgraph Ingestion["1. Document Ingestion & Parsing"]
+        PDF[Research PDFs / Docs] --> Parser[Layout-Aware Parser: MinerU / Docling]
+        Parser --> TextBlock[Clean Markdown Text]
+        Parser --> TableBlock[Tables / Structured Data]
+        Parser --> FigureBlock[Cropped Figures & Diagrams + Captions]
+        Parser --> FormulaBlock[LaTeX Math Formulas]
+    end
+
+    subgraph Indexing["2. Embedding & Multi-Index Storage"]
+        TextBlock --> TextEmbed[Dense Embedder: BGE-M3 / OpenAI]
+        TableBlock --> TableMarkdown[HTML / Markdown Conversion]
+        FigureBlock --> VLMDesc[VLM Summarizer: GPT-4o / Qwen2-VL]
+        
+        TextEmbed --> VectorDB[(Vector Database / Qdrant)]
+        TableMarkdown --> VectorDB
+        VLMDesc --> VectorDB
+        
+        PDF --> PageRaster[Page Rasterizer (Optional ColPali Pipeline)] --> DocStore[(Multi-Vector Store)]
+    end
+
+    subgraph Retrieval["3. Hybrid Multimodal Retrieval"]
+        UserQuery([User Query: Text / Visual Question]) --> QueryRouter{Query Intent Router}
+        QueryRouter -->|Semantic/Keyword| TextSearch[Text k-NN & BM25 Search]
+        QueryRouter -->|Visual/Chart/Table| VisualSearch[Image Summary & Table Vector Search]
+        
+        TextSearch --> ContextAssembler[Context Assembler]
+        VisualSearch --> ContextAssembler
+    end
+
+    subgraph Generation["4. Multimodal Generation & Citation"]
+        ContextAssembler --> Prompt[Interleaved Prompt Construction]
+        Prompt --> VLM[Vision-Language Model: Claude 3.5 Sonnet / GPT-4o]
+        VLM --> FinalOutput([Synthesized Answer with Bounding-Box/Figure Citations])
+    end
