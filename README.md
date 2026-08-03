@@ -51,3 +51,54 @@ Expected:
 
 user.name=research-ai-user
 user.email=researcher@example.com
+
+
+Install Development Tools
+Homebrew
+
+Check:
+
+brew --version
+
+If missing:
+
+Install from:
+
+Homebrew Official Website
+
+Install common tools:
+
+brew install python
+brew install node
+brew install git
+brew install wget
+brew install jq
+
+
+Verify:
+python3 --version
+
+node --version
+
+git --version
+
+
+Create Project Folder
+
+Example:
+
+cd ~/Documents
+
+Create project:
+
+mkdir rag-research-system
+
+Enter:
+
+cd rag-research-system
+
+Initialize Git Repository
+
+Run:
+
+git init
